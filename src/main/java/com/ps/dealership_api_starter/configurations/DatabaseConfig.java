@@ -1,5 +1,6 @@
 package com.ps.dealership_api_starter.configurations;
 
+import com.ps.dealership_api_starter.data.VehicleDao;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class DatabaseConfig
 {
     private BasicDataSource basicDataSource;
+    private VehicleDao vehicleDao;
 
     @Bean
     public BasicDataSource dataSource()
