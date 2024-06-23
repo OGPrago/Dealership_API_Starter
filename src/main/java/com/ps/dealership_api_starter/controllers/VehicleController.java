@@ -22,36 +22,56 @@ public class VehicleController {
 
     @GetMapping("")
     public List<Vehicle> vehicleSearch(
-            @RequestParam(name="yearMin", required = false) Integer yearMin,
-            @RequestParam(name="yearMax", required = false) Integer yearMax,
-            @RequestParam(name="make", required = false) String make,
-            @RequestParam(name="model", required = false) String model,
-            @RequestParam(name="vehicleType", required = false) String vehicleType,
-            @RequestParam(name="color", required = false) String color,
-            @RequestParam(name="odometerMin", required = false) Integer odometerMin,
-            @RequestParam(name="odomterMax", required = false) Integer odometerMax,
-            @RequestParam(name="priceMin", required = false) Double priceMin,
-            @RequestParam(name="priceMax", required = false) Double priceMax
+            @RequestParam(name = "yearMin", required = false) Integer yearMin,
+            @RequestParam(name = "yearMax", required = false) Integer yearMax,
+            @RequestParam(name = "make", required = false) String make,
+            @RequestParam(name = "model", required = false) String model,
+            @RequestParam(name = "vehicleType", required = false) String vehicleType,
+            @RequestParam(name = "color", required = false) String color,
+            @RequestParam(name = "odometerMin", required = false) Integer odometerMin,
+            @RequestParam(name = "odomterMax", required = false) Integer odometerMax,
+            @RequestParam(name = "priceMin", required = false) Double priceMin,
+            @RequestParam(name = "priceMax", required = false) Double priceMax
     ) {
-        try
-        {
-            return vehicleDao.vehicleSearch(yearMin,  yearMax,  make,  model,  vehicleType,  color,  odometerMin, odometerMax, priceMin,  priceMax);
-        }
-        catch(Exception ex)
-        {
+        try {
+            return vehicleDao.vehicleSearch(yearMin, yearMax, make, model, vehicleType, color, odometerMin, odometerMax, priceMin, priceMax);
+        } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
 
     @GetMapping("{vin}")
     public Vehicle getByVin(@PathVariable int vin) {
-      return vehicleDao.getByVin(vin);
+        return vehicleDao.getByVin(vin);
     }
 
     @PostMapping()
     public Vehicle addVehicle(@RequestBody Vehicle vehicle) {
         try {
             return vehicleDao.createVehicle(vehicle);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
+
+    @PutMapping("{vin}")
+    public void updateVehicle(@PathVariable int vin, @RequestBody Vehicle vehicle) {
+        try {
+            vehicleDao.updateVehicle(vin, vehicle);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
+
+    @DeleteMapping("{vin}")
+    public void deleteVehicle(@PathVariable int vin) {
+        try {
+            var product = vehicleDao.getByVin(vin);
+
+            if (product == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            }
+            vehicleDao.deleteVehicle(vin);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }

@@ -134,7 +134,18 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
 
     @Override
     public void deleteVehicle(int vin) {
+        String sql = "DELETE FROM vehicles" +
+                " WHERE vin = ?;";
 
+        try(Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, vin);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     protected static Vehicle mapResultset(ResultSet resultSet) throws SQLException {
