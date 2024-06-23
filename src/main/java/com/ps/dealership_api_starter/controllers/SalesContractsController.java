@@ -31,4 +31,13 @@ public class SalesContractsController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
     }
+
+    @PostMapping()
+    public SalesContract addSalesContract(@RequestBody SalesContract salesContract) {
+        try {
+            return salesContractDao.addSalesContracts(salesContract);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
 }
