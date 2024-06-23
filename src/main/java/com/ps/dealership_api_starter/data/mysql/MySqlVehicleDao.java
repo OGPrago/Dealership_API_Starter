@@ -129,15 +129,42 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
 
     @Override
     public void updateVehicle(int vin, Vehicle vehicle) {
+        String sql = "UPDATE vehicles " +
+                "SET year = ?, " +
+                "make = ?, " +
+                "model = ?, " +
+                "vehicle_type = ?, " +
+                "color = ?, " +
+                "odometer = ?, " +
+                "price = ?, " +
+                "sold = ? " +
+                "WHERE vin = ?;";
 
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, vehicle.getYear());
+            preparedStatement.setString(2, vehicle.getMake());
+            preparedStatement.setString(3, vehicle.getModel());
+            preparedStatement.setString(4, vehicle.getVehicleType());
+            preparedStatement.setString(5, vehicle.getColor());
+            preparedStatement.setInt(6, vehicle.getOdometer());
+            preparedStatement.setDouble(7, vehicle.getPrice());
+            preparedStatement.setBoolean(8, vehicle.isSold());
+            preparedStatement.setInt(9, vin);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
+
 
     @Override
     public void deleteVehicle(int vin) {
         String sql = "DELETE FROM vehicles" +
                 " WHERE vin = ?;";
 
-        try(Connection connection = getConnection()) {
+        try (Connection connection = getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, vin);
 
