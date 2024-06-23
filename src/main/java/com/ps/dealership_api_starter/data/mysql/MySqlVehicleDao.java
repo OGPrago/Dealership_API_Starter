@@ -23,16 +23,8 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
     @Override
     public List<Vehicle> vehicleSearch(Integer yearMin, Integer yearMax, String make, String model, String vehicleType, String color, Integer odometerMin, Integer odometerMax, Double priceMin, Double priceMax) {
         List<Vehicle> vehicles = new ArrayList<>();
-//        String query = "SELECT * FROM vehicles " +
-//                "WHERE (year BETWEEN ? AND ?) " +
-//                "AND (make LIKE ?) " +
-//                "AND (model LIKE ?) " +
-//                "AND (price BETWEEN ? AND ?) " +
-//                "AND (color LIKE ?) " +
-//                "AND (odometer BETWEEN ? AND ?) " +
-//                "AND (vehicle_type LIKE ?)";
 
-        String query = "SELECT * FROM vehicles " +
+        String sql = "SELECT * FROM vehicles " +
                 "WHERE (year >= ?) AND (year <= ?) " +
                 "AND make LIKE ? " +
                 "AND model LIKE ? " +
@@ -55,7 +47,7 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
         try (
                 Connection connection = getConnection();
         ) {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
             preparedStatement.setInt(1, yearMin);
             preparedStatement.setInt(2, yearMax);
@@ -102,6 +94,36 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
 
     @Override
     public Vehicle createVehicle(Vehicle vehicle) {
+        String sql = "INSERT INTO vehicles(vin, year, make, model, vehicle_type, color, odometer, price, sold) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            preparedStatement.setInt(1, vehicle.getVin());
+            preparedStatement.setInt(2, vehicle.getYear());
+            preparedStatement.setString(3, vehicle.getMake());
+            preparedStatement.setString(4, vehicle.getModel());
+            preparedStatement.setString(5, vehicle.getVehicleType());
+            preparedStatement.setString(6, vehicle.getColor());
+            preparedStatement.setInt(7, vehicle.getOdometer());
+            preparedStatement.setDouble(8, vehicle.getPrice());
+            preparedStatement.setBoolean(9, vehicle.isSold());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+
+                if (generatedKeys.next()) {
+                    int vin = generatedKeys.getInt(1);
+
+                    return getByVin(vin);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         return null;
     }
 

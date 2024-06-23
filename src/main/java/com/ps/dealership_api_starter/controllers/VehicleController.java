@@ -47,4 +47,13 @@ public class VehicleController {
     public Vehicle getByVin(@PathVariable int vin) {
       return vehicleDao.getByVin(vin);
     }
+
+    @PostMapping()
+    public Vehicle addVehicle(@RequestBody Vehicle vehicle) {
+        try {
+            return vehicleDao.createVehicle(vehicle);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
 }
