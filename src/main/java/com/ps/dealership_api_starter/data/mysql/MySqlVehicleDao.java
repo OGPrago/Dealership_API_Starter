@@ -21,14 +21,36 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
     }
 
     @Override
-    public List<Vehicle> vehicleSearch(int yearMin, int yearMax, String make, String model, String vehicleType, String color, int odometerMin, int odometerMax, double priceMin, double priceMax) {
+    public List<Vehicle> vehicleSearch(Integer yearMin, Integer yearMax, String make, String model, String vehicleType, String color, Integer odometerMin, Integer odometerMax, Double priceMin, Double priceMax) {
         List<Vehicle> vehicles = new ArrayList<>();
-        String query = "SELECT * FROM vehicles WHERE price BETWEEN ? AND ?" +
-                "AND make LIKE '%?%' AND model LIKE '%?%' " +
-                "AND year BETWEEN ? AND ?" +
-                "AND color LIKE '%?%'" +
-                "AND odometer BETWEEN ? AND ?" +
-                "AND vehicle_type LIKE '%?%'";
+//        String query = "SELECT * FROM vehicles " +
+//                "WHERE (year BETWEEN ? AND ?) " +
+//                "AND (make LIKE ?) " +
+//                "AND (model LIKE ?) " +
+//                "AND (price BETWEEN ? AND ?) " +
+//                "AND (color LIKE ?) " +
+//                "AND (odometer BETWEEN ? AND ?) " +
+//                "AND (vehicle_type LIKE ?)";
+
+        String query = "SELECT * FROM vehicles " +
+                "WHERE (year >= ?) AND (year <= ?) " +
+                "AND make LIKE ? " +
+                "AND model LIKE ? " +
+                "AND vehicle_type LIKE ? " +
+                "AND color LIKE ? " +
+                "AND (odometer >= ?) AND (odometer <= ?) " +
+                "AND (price >= ?) AND (price <= ?)";
+
+        yearMin = (yearMin == null) ? Integer.MIN_VALUE : yearMin;
+        yearMax = (yearMax == null) ? Integer.MAX_VALUE : yearMax;
+        make = (make == null || make.isEmpty()) ? "%" : "%" + make + "%";
+        model = (model == null || model.isEmpty()) ? "%" : "%" + model + "%";
+        vehicleType = (vehicleType == null || vehicleType.isEmpty()) ? "%" : "%" + vehicleType + "%";
+        color = (color == null || color.isEmpty()) ? "%" : "%" + color + "%";
+        odometerMin = (odometerMin == null) ? Integer.MIN_VALUE : odometerMin;
+        odometerMax = (odometerMax == null) ? Integer.MAX_VALUE : odometerMax;
+        priceMin = (priceMin == null) ? Double.MIN_VALUE : priceMin;
+        priceMax = (priceMax == null) ? Double.MAX_VALUE : priceMax;
 
         try (
                 Connection connection = getConnection();
@@ -48,13 +70,14 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()) {
-                return (List<Vehicle>) mapResultset(resultSet);
+            while (resultSet.next()) {
+                Vehicle vehicle = mapResultset(resultSet);
+                vehicles.add(vehicle);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return vehicles;
     }
 
     @Override
@@ -93,15 +116,15 @@ public class MySqlVehicleDao extends MySqlDaoBase implements VehicleDao {
     }
 
     protected static Vehicle mapResultset(ResultSet resultSet) throws SQLException {
-        int vin = resultSet.getInt("vin");
-        int year = resultSet.getInt("year");
+        Integer vin = resultSet.getInt("vin");
+        Integer year = resultSet.getInt("year");
         String make = resultSet.getString("make");
         String model = resultSet.getString("model");
         String vehicleType = resultSet.getString("vehicle_type");
         String color = resultSet.getString("color");
-        int odometer = resultSet.getInt("odometer");
-        double price = resultSet.getDouble("price");
-        boolean sold = resultSet.getBoolean("sold");
+        Integer odometer = resultSet.getInt("odometer");
+        Double price = resultSet.getDouble("price");
+        Boolean sold = resultSet.getBoolean("sold");
 
         return new Vehicle(vin, year, make, model, vehicleType, color, odometer, price, sold);
     }

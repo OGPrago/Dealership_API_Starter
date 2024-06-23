@@ -22,16 +22,16 @@ public class VehicleController {
 
     @GetMapping("")
     public List<Vehicle> vehicleSearch(
-            @RequestParam(name="yearMin", required = false) int yearMin,
-            @RequestParam(name="yearMax", required = false) int yearMax,
+            @RequestParam(name="yearMin", required = false) Integer yearMin,
+            @RequestParam(name="yearMax", required = false) Integer yearMax,
             @RequestParam(name="make", required = false) String make,
             @RequestParam(name="model", required = false) String model,
             @RequestParam(name="vehicleType", required = false) String vehicleType,
             @RequestParam(name="color", required = false) String color,
-            @RequestParam(name="odometerMin", required = false) int odometerMin,
-            @RequestParam(name="odomterMax", required = false) int odometerMax,
-            @RequestParam(name="priceMin", required = false) double priceMin,
-            @RequestParam(name="priceMax", required = false) double priceMax
+            @RequestParam(name="odometerMin", required = false) Integer odometerMin,
+            @RequestParam(name="odomterMax", required = false) Integer odometerMax,
+            @RequestParam(name="priceMin", required = false) Double priceMin,
+            @RequestParam(name="priceMax", required = false) Double priceMax
     ) {
         try
         {
