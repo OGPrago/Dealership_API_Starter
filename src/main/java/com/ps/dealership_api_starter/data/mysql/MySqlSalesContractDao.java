@@ -4,6 +4,7 @@ import com.ps.dealership_api_starter.data.SalesContractDao;
 import com.ps.dealership_api_starter.models.Dealership;
 import com.ps.dealership_api_starter.models.SalesContract;
 import com.ps.dealership_api_starter.models.Vehicle;
+import jdk.jshell.spi.SPIResolutionException;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -40,6 +41,37 @@ public class MySqlSalesContractDao extends MySqlDaoBase implements SalesContract
 
     @Override
     public SalesContract addSalesContracts(SalesContract salesContract) {
+        String sql = "INSERT INTO sales_contracts(contract_date, customer_name, customer_email, vin, sales_tax, recording_fee, processing_fee, total_price, finance_option, monthly_payment) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+
+        try(Connection connection = getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, salesContract.getContractDate());
+            preparedStatement.setString(2, salesContract.getCustomerName());
+            preparedStatement.setString(3, salesContract.getCustomerEmail());
+            preparedStatement.setInt(4, salesContract.getVin());
+            preparedStatement.setDouble(5, salesContract.getSalesTax());
+            preparedStatement.setDouble(6, salesContract.getRecordingFee());
+            preparedStatement.setDouble(7, salesContract.getProcessingFee());
+            preparedStatement.setDouble(8, salesContract.getTotalPrice());
+            preparedStatement.setString(9, salesContract.getFinanceOption());
+            preparedStatement.setDouble(10, salesContract.getMonthlyPayment());
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+
+                if (generatedKeys.next()) {
+                    int contractId = generatedKeys.getInt(1);
+
+                    return getSalesContractsById(contractId);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
         return null;
     }
 
